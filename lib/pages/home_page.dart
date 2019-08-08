@@ -3,6 +3,7 @@ import '../service/service_method.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'dart:convert';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -34,16 +35,24 @@ class _HomePageState extends State<HomePage> {
             List<Map> swiper = (data['data']['slides'] as List).cast();
             List<Map> naigatorList = (data['data']['category'] as List).cast();
             String adPicture = (data['data']['advertesPicture']['PICTURE_ADDRESS'] as String);
-
+            String leaderImage = (data['data']['shopInfo']['leaderImage'] as String);
+            String leaderPhone = (data['data']['shopInfo']['leaderPhone'] as String);
+            List<Map> recommendList = (data['data']['recommend'] as List).cast();
+            recommendList.insert(recommendList.length, recommendList[0]);
             if(naigatorList.length>10){
               naigatorList.removeRange(10,naigatorList.length);
             }
-            return Column(
+            return 
+            SingleChildScrollView(
+              child: Column(
               children: <Widget>[
                 SwiperDiy(swiperDataList:swiper),
                 TopNavigator(naigatorList:naigatorList),
                 AdBanner(adPicture:adPicture),
+                LeaderPhoneView(leaderImage:leaderImage,leaderPhone:leaderPhone),
+                Recommend(recommendList:recommendList),
               ],
+            ),
             );
           }else{
             return Center(
@@ -79,6 +88,7 @@ class SwiperDiy extends StatelessWidget {
     );
   }
 }
+// 分类列表
 class TopNavigator extends StatelessWidget {
   final List naigatorList;
   const TopNavigator({Key key,this.naigatorList}) : super(key: key);
@@ -107,7 +117,7 @@ class TopNavigator extends StatelessWidget {
     );
   }
 }
-
+// 广告banner
 class AdBanner extends StatelessWidget {
   final String adPicture;
   const AdBanner({Key key,this.adPicture}) : super(key: key);
@@ -116,6 +126,117 @@ class AdBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Image.network(adPicture),
+    );
+  }
+}
+// 联系店长
+class LeaderPhoneView extends StatelessWidget {
+  final String leaderImage;
+  final String leaderPhone;
+  const LeaderPhoneView({Key key,this.leaderImage,this.leaderPhone}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: InkWell(
+        onTap: _launchURL,
+        child: Image.network(leaderImage),
+      ),
+    );
+  }
+  void _launchURL() async{
+    String url = 'tel:'+leaderPhone;
+    if(await canLaunch(url)){
+      await launch(url);
+    }else{
+      throw "URL不能进行访问${url}";
+    }
+  }
+}
+// 商品推荐
+class Recommend extends StatelessWidget {
+  final List recommendList;
+  const Recommend({Key key,this.recommendList}) : super(key: key);
+
+  // 标题widget
+  Widget _titleWidget(){
+    return Container(
+      alignment: Alignment.centerLeft,
+      padding: EdgeInsets.fromLTRB(10.0, 2.0, 0, 5.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(width: 0.5,color: Colors.black12),
+        )
+      ),
+      child: Text(
+        '商品推荐',
+        style: TextStyle(
+          color: Colors.pink
+        ),
+      ),
+    );
+  }
+  // 商品items
+  Widget _item(index){
+    return InkWell(
+      onTap: (){
+
+      },
+      child: Container(
+        height: ScreenUtil().setHeight(330),
+        width: ScreenUtil().setWidth(250),
+        padding: EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            left: BorderSide(
+              width: 0.5,
+              color: Colors.black12,
+            )
+          ),
+        ),
+        child: Column(
+          children: <Widget>[
+            Image.network(recommendList[index]['image']),
+            Text("￥${recommendList[index]['mallPrice']}"),
+            Text(
+              "￥${recommendList[index]['price']}",
+              style: TextStyle(
+                decoration: TextDecoration.lineThrough,
+                color: Colors.grey
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 横向列表
+  Widget _recommendList(){
+    return Container(
+      height: ScreenUtil().setHeight(349),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+          itemCount: recommendList.length,
+          itemBuilder: (context,index){
+            return _item(index);
+          },
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(top: 10.0),
+      height: ScreenUtil().setHeight(410),
+      child: Column(
+        children: <Widget>[
+          _titleWidget(),
+          _recommendList(),
+        ],
+      ),
     );
   }
 }
