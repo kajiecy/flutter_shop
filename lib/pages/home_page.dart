@@ -10,17 +10,16 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin{
   String homePageContext = '正在获取数据';
   @override
   void initState() {
-    getHomePageContent().then((val){
-      setState(() {
-       homePageContext = val.toString(); 
-      });
-    });
     super.initState();
   }
+
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +27,7 @@ class _HomePageState extends State<HomePage> {
         title: Text('百姓生活+'),
       ),
       body: FutureBuilder(
-        future: getHomePageContent(),
+        future: request('homePageContext', {'lon':'115.02932','lat':'35.76189'}),
         builder: (context,snapshot){
           if(snapshot.hasData){
             var data = json.decode(snapshot.data.toString());
@@ -38,6 +37,14 @@ class _HomePageState extends State<HomePage> {
             String leaderImage = (data['data']['shopInfo']['leaderImage'] as String);
             String leaderPhone = (data['data']['shopInfo']['leaderPhone'] as String);
             List<Map> recommendList = (data['data']['recommend'] as List).cast();
+
+            String pictureAddress1 = (data['data']['floor1Pic']['PICTURE_ADDRESS'] as String);
+            List<Map> floorGoodList1 = (data['data']['floor1'] as List).cast();
+            String pictureAddress2 = (data['data']['floor2Pic']['PICTURE_ADDRESS'] as String);
+            List<Map> floorGoodList2 = (data['data']['floor2'] as List).cast();
+            String pictureAddress3 = (data['data']['floor3Pic']['PICTURE_ADDRESS'] as String);
+            List<Map> floorGoodList3 = (data['data']['floor3'] as List).cast();
+
             recommendList.insert(recommendList.length, recommendList[0]);
             if(naigatorList.length>10){
               naigatorList.removeRange(10,naigatorList.length);
@@ -51,6 +58,13 @@ class _HomePageState extends State<HomePage> {
                 AdBanner(adPicture:adPicture),
                 LeaderPhoneView(leaderImage:leaderImage,leaderPhone:leaderPhone),
                 Recommend(recommendList:recommendList),
+                FloorTitle(pictureAddress:pictureAddress1),
+                FloorContent(floorGoodList:floorGoodList1),
+                FloorTitle(pictureAddress:pictureAddress2),
+                FloorContent(floorGoodList:floorGoodList2),
+                FloorTitle(pictureAddress:pictureAddress3),
+                FloorContent(floorGoodList:floorGoodList3),
+                HotGoods(),
               ],
             ),
             );
@@ -92,7 +106,6 @@ class SwiperDiy extends StatelessWidget {
 class TopNavigator extends StatelessWidget {
   final List naigatorList;
   const TopNavigator({Key key,this.naigatorList}) : super(key: key);
-
   Widget _gridViewItemUI(BuildContext context,item){
     return InkWell(
       onTap: (){print('点击了导航');},
@@ -240,3 +253,87 @@ class Recommend extends StatelessWidget {
     );
   }
 }
+// 楼层标题
+class FloorTitle extends StatelessWidget {
+  final String pictureAddress;
+  const FloorTitle({Key key,this.pictureAddress}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(0.0,0.0,0.0,0.0),
+      child: Image.network(pictureAddress),
+    );
+  }
+}
+
+// 楼层楼层商品
+class FloorContent extends StatelessWidget {
+  final List floorGoodList;
+  const FloorContent ({Key key,this.floorGoodList}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          _firstRow(),
+          _otherGoods(),
+        ],
+      ),
+    );
+  }
+  Widget _firstRow(){
+    return Row(
+      children: <Widget>[
+        _goodsItem(floorGoodList[0]),
+        Column(
+          children: <Widget>[
+            _goodsItem(floorGoodList[1]),
+            _goodsItem(floorGoodList[2]),
+          ],
+        )
+      ],
+    );
+  }
+  Widget _otherGoods(){
+    return Row(
+      children: <Widget>[
+        _goodsItem(floorGoodList[3]),
+        _goodsItem(floorGoodList[4]),
+      ],
+    );
+  }
+
+  Widget _goodsItem(Map goods){
+    return Container(
+      width: ScreenUtil().setWidth(375),
+      child: InkWell(
+        onTap: (){
+
+        },
+        child: Image.network(goods['image']),
+      ),
+    );
+  }
+}
+
+class HotGoods extends StatefulWidget {
+  @override
+  _HotGoodsState createState() => _HotGoodsState();
+}
+
+class _HotGoodsState extends State<HotGoods> {
+
+  @override
+  Widget build(BuildContext context) {
+    return Text("HotGoods 333");
+  }
+
+  @override
+  void initState() {
+    request('homePageBelowConten',1).then((val){
+      print(val.toString());
+    });
+    super.initState();
+  }
+}
+
