@@ -14,6 +14,11 @@ class CategoryPage extends StatelessWidget {
         child: Row(
           children: <Widget>[
             LeftCategoryNav(),
+            Column(
+              children: <Widget>[
+                RightCategoryView(),
+              ],
+            ),
           ],
         ),
       ),
@@ -26,7 +31,6 @@ class LeftCategoryNav extends StatefulWidget {
   @override
   _LeftCategoryNavState createState() => _LeftCategoryNavState();
 }
-
 class _LeftCategoryNavState extends State<LeftCategoryNav> {
   List<CategoryModel> categoryModelList = [];
   int currentIndex;
@@ -71,7 +75,6 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
       ),
     );
   }
-
   void _getCategoryList() async {
     await request('getCategory').then((val) {
       setState(() {
@@ -80,4 +83,61 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
       });
     });
   }
+}
+
+
+//右侧展示界面
+class RightCategoryView extends StatefulWidget {
+  @override
+  _RightCategoryViewState createState() => _RightCategoryViewState();
+}
+class _RightCategoryViewState extends State<RightCategoryView> {
+  List secondCategory = ['名酒','宝丰','北京二锅头','牛栏山','茅台','五粮液'];
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: ScreenUtil().setHeight(80),
+      width: ScreenUtil().setWidth(570),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.black12,
+            width: 0.5,
+          )
+        )
+      ),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: secondCategory.length,
+        itemBuilder: (context,index){
+          return _secondCategoryInkWell(secondCategory[index]);
+        }),
+    );
+  }
+
+  Widget _secondCategoryInkWell(item){
+    return Container(
+      padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
+      decoration: BoxDecoration(
+        border: Border(
+          right: BorderSide(
+            width: 0.5,
+            color: Colors.black12
+          )
+        )
+      ),
+      child: InkWell(
+        onTap: (){},
+        child: Text(
+          item,
+          style: TextStyle(
+            fontSize: ScreenUtil().setSp(28),
+          ),
+        ),
+      ),
+    );
+  }
+
+
 }
