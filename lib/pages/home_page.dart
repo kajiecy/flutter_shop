@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/phoenix_footer.dart';
+import './../model/category.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
