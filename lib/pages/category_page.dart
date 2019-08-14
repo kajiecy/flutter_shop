@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import './../service/service_method.dart';
 import './../model/category.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:provide/provide.dart';
+import '../provide/child_category.dart';
 class CategoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -33,7 +34,7 @@ class LeftCategoryNav extends StatefulWidget {
 }
 class _LeftCategoryNavState extends State<LeftCategoryNav> {
   List<CategoryModel> categoryModelList = [];
-  int currentIndex;
+  int currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -52,20 +53,25 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
 
   @override
   void initState() {
-    super.initState();
     _getCategoryList();
+    super.initState();
   }
 
   Widget _leftInkWell(int index) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        setState(() {
+          this.currentIndex = index;
+        });
+        List<BxMallSubDto> bxMallSubDto = this.categoryModelList[index].bxMallSubDto;
+        Provide.value<ChildCategory>(context).setChildCategoryModel(bxMallSubDto);
+      },
       child: Container(
         height: ScreenUtil().setHeight(100),
-        padding: EdgeInsets.only(left: 10, top: 20),
+        padding: EdgeInsets.only(left: 10, top: 15),
         decoration: BoxDecoration(
-            color: this.currentIndex == index ? Colors.black12 : Colors.white,
-            border:
-                Border(bottom: BorderSide(width: 1, color: Colors.black12))),
+            color: this.currentIndex == index ? Color.fromRGBO(236, 236, 236, 1.0) : Colors.white,
+            border: Border(bottom: BorderSide(width: 1, color: Colors.black12))),
         child: Text(
           categoryModelList[index].mallCategoryName,
           style: TextStyle(
@@ -79,8 +85,9 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
     await request('getCategory').then((val) {
       setState(() {
         categoryModelList = getCategoryModelList(val.toString());
-        print(categoryModelList);
+        print('执行到这里');
       });
+      Provide.value<ChildCategory>(context).setChildCategoryModel(this.categoryModelList[this.currentIndex].bxMallSubDto);
     });
   }
 }
@@ -92,27 +99,38 @@ class RightCategoryView extends StatefulWidget {
   _RightCategoryViewState createState() => _RightCategoryViewState();
 }
 class _RightCategoryViewState extends State<RightCategoryView> {
-  List secondCategory = ['名酒','宝丰','北京二锅头','牛栏山','茅台','五粮液'];
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: ScreenUtil().setHeight(80),
-      width: ScreenUtil().setWidth(570),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.black12,
-            width: 0.5,
-          )
-        )
-      ),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: secondCategory.length,
-        itemBuilder: (context,index){
-          return _secondCategoryInkWell(secondCategory[index]);
-        }),
+    return Column(
+      children: <Widget>[
+        Container(
+          height: ScreenUtil().setHeight(80),
+          width: ScreenUtil().setWidth(570),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(
+              bottom: BorderSide(
+                color: Colors.black12,
+                width: 0.5,
+              )
+            )
+          ),
+          child:Provide<ChildCategory>(
+            builder:(builder,child,childCategory){
+              return ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: childCategory.childCategoryList.length,
+                itemBuilder: (context,index){
+                  return _secondCategoryInkWell(childCategory.childCategoryList[index].mallSubName);
+                });
+            }),
+        ),
+        Provide<ChildCategory>(
+          builder: (builder,child,childCategory){
+            return Text(childCategory.childCategoryList.length.toString());
+          },
+        ),
+      ],
     );
   }
 
