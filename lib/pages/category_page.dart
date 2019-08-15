@@ -4,6 +4,9 @@ import './../model/category.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provide/provide.dart';
 import '../provide/child_category.dart';
+import 'dart:convert';
+import '../model/mall_goods_model.dart';
+
 class CategoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -130,6 +133,7 @@ class _RightCategoryViewState extends State<RightCategoryView> {
             return Text(childCategory.childCategoryList.length.toString());
           },
         ),
+        CategoryGoodsList(),
       ],
     );
   }
@@ -156,6 +160,37 @@ class _RightCategoryViewState extends State<RightCategoryView> {
       ),
     );
   }
+}
+// 商品列表 可以上拉加载效果
+class CategoryGoodsList extends StatefulWidget {
+  @override
+  _CategoryGoodsListState createState() => _CategoryGoodsListState();
+}
+class _CategoryGoodsListState extends State<CategoryGoodsList> {
 
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Text('商品列表'),
+    );
+  }
+  void _getGoodsList()async{
+    var data = {
+      "categoryId":"4",
+      "categorySubId":"",
+      "page":"1",
+    };
+    await request('getMallGoods',formData: data).then((result){
+      var data = json.decode(result.toString());
+      List<MallGoodsModel> mallGoodsModelList = MallGoodsResponse.getMallGoodsModelList(result.toString());
+      print('商品列表信息为：${data.toString()}');
+    });
+  }
+
+  @override
+  void initState() {
+    this._getGoodsList();
+    super.initState();
+  }
 
 }
