@@ -4,6 +4,7 @@ import './../model/category.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provide/provide.dart';
 import '../provide/child_category.dart';
+import '../provide/category_goods_list.dart';
 import 'dart:convert';
 import '../model/mall_goods_model.dart';
 
@@ -89,19 +90,14 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
       ),
     );
   }
-  void _getCategoryList() async {
-    await request('getCategory').then((val) {
+  void _getGoodsList({String categoryId}) async{
+    await request('getMallGoods',formData: {
+      "categoryId":categoryId==null?'4':categoryId,
+      "categorySubId":'',
+      "page":1
+    }).then((result){
       setState(() {
-        categoryModelList = getCategoryModelList(val.toString());
-        Provide.value<ChildCategory>(context).setChildCategoryModel(this.categoryModelList[Provide.value<ChildCategory>(context).currentIndex].bxMallSubDto);
-        Provide.value<ChildCategory>(context).currentCategoryId = this.categoryModelList[Provide.value<ChildCategory>(context).currentIndex].mallCategoryId;
-        RequestUtil.getGoodsList(context).then((result){
-          setState(() {
-            Provide.value<ChildCategory>(context).mallGoodsModelList = MallGoodsResponse.getMallGoodsModelList(result.toString());
-          });
-          print('商品列表信息为：${Provide.value<ChildCategory>(context).mallGoodsModelList.toString()}');
-        });
-        print('执行到这里');
+        Provide.value<ChildCategory>(context).mallGoodsModelList = MallGoodsResponse.getMallGoodsModelList(result.toString());
       });
     });
   }
@@ -288,12 +284,12 @@ class MallGoodsRow extends StatelessWidget {
   }
 }
 
-class RequestUtil{
-  static Future getGoodsList(BuildContext context)async{
-    return await request('getMallGoods',formData: {
-      "categoryId":Provide.value<ChildCategory>(context).currentCategoryId,
-      "categorySubId":Provide.value<ChildCategory>(context).childCategoryList[Provide.value<ChildCategory>(context).secondCurrentIndex].mallCategoryId,
-      "page":1,
-    });
-  }
-}
+//class RequestUtil{
+//  static Future getGoodsList(BuildContext context)async{
+//    return await request('getMallGoods',formData: {
+//      "categoryId":Provide.value<ChildCategory>(context).currentCategoryId,
+//      "categorySubId":Provide.value<ChildCategory>(context).childCategoryList[Provide.value<ChildCategory>(context).secondCurrentIndex].mallCategoryId,
+//      "page":1,
+//    });
+//  }
+//}
