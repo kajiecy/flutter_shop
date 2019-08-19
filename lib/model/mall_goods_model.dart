@@ -67,4 +67,5 @@ class MallGoodsModel {
     "goodsName": goodsName == null ? null : goodsName,
     "goodsId": goodsId == null ? null : goodsId,
   };
+
 }
