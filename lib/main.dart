@@ -3,12 +3,12 @@ import 'package:provide/provide.dart';
 import './pages/index_page.dart';
 import './provide/counter.dart';
 import './provide/child_category.dart';
-import './provide/category_goods_list.dart';
+import './provide/category_goods_list_store.dart';
 
 void main(){
   var counter = Counter();
   var childCategory = ChildCategory();
-  var categoryGoodsList = CategoryGoodsList();
+  var categoryGoodsList = CategoryGoodsListStore();
 
   // 全局状态管理
   final providers = Providers();
@@ -16,7 +16,7 @@ void main(){
   providers
     ..provide(Provider<Counter>.value(counter))
     ..provide(Provider<ChildCategory>.value(childCategory))
-    ..provide(Provider<CategoryGoodsList>.value(categoryGoodsList));
+    ..provide(Provider<CategoryGoodsListStore>.value(categoryGoodsList));
 
   runApp(ProviderNode(providers: providers,child: MyApp(),));
 }
