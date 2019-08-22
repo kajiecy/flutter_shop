@@ -1,6 +1,5 @@
 // To parse this JSON data, do
-//
-//     final mallGoodsResponse = mallGoodsResponseFromJson(jsonString);
+// final mallGoodsResponse = mallGoodsResponseFromJson(jsonString);
 
 import 'dart:convert';
 

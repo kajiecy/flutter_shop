@@ -10,7 +10,7 @@ import '../model/mall_goods_model.dart';
 
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/phoenix_footer.dart';
-
+import 'package:flutter_easyrefresh/phoenix_header.dart';
 
 class CategoryPage extends StatelessWidget {
   @override
@@ -148,8 +148,7 @@ class _RightCategoryViewState extends State<RightCategoryView> {
   }
 
   Widget _secondCategoryInkWell(BxMallSubDto item,index){
-    return
-    Provide<ChildCategory>(
+    return Provide<ChildCategory>(
         builder:(builder,child,childCategory){
          return  Container(
            padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
@@ -226,10 +225,15 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
                     );
                   }
               ),
+              onRefresh:() async {
+                print('触发onRefresh');
+                this._getGoodsListByPage();
+              },
               onLoad: () async {
                 print('触发onLoad');
                 this._getGoodsListByPage();
               },
+              header: PhoenixHeader(),
               footer: PhoenixFooter(),
             ),
 
@@ -239,6 +243,7 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
   }
   // 执行上拉加载 下拉刷新时调用的方法
   void _getGoodsListByPage({int currentPage}) async{
+    print('执行上拉加载 下拉刷新时调用的方法');
     BxMallSubDto currentBxMallSubDtoInfo = Provide.value<ChildCategory>(context).getCurrentBxMallSubDtoInfo();
     String goodListStr = await RequestUtil.getGoodsList(categoryId: currentBxMallSubDtoInfo.mallCategoryId,categorySubId: currentBxMallSubDtoInfo.mallSubId,page: currentPage);
     MallGoodsResponse.getMallGoodsModelList(goodListStr);
