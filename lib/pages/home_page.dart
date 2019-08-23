@@ -20,14 +20,13 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin{
 
   @override
   bool get wantKeepAlive {
-    print('wantKeepAlive');
+
     return true;
   }
 
   @override
   void initState() {
     super.initState();
-    print('2');
     _getHotGoods();
   }
 

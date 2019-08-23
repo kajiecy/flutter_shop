@@ -5,7 +5,8 @@ import '../model/mall_goods_model.dart';
 class ChildCategory with ChangeNotifier{
    List<BxMallSubDto> _childCategoryList= [];
    int _secondCurrentIndex = 0;
-   int _currentPage = 0;
+
+   int _currentPage = 1;
 
    int get currentPage => _currentPage;
 

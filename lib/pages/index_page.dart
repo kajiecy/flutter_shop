@@ -43,7 +43,7 @@ class _IndexPageState extends State<IndexPage> {
 
   @override
   void initState() {
-    print(1);
+
     currentPage = tabBodies[currentIndex];
     super.initState();
   }

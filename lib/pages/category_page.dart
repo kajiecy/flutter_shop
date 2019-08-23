@@ -10,7 +10,8 @@ import '../model/mall_goods_model.dart';
 
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/phoenix_footer.dart';
-import 'package:flutter_easyrefresh/phoenix_header.dart';
+//import 'package:flutter_easyrefresh/phoenix_header.dart';
+import 'package:flutter_easyrefresh/taurus_header.dart';
 
 class CategoryPage extends StatelessWidget {
   @override
@@ -76,6 +77,7 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
             String goodListStr = await RequestUtil.getGoodsList(categoryId: this.categoryModelList[this.currentIndex].mallCategoryId);
             List<MallGoodsModel> list = MallGoodsResponse.getMallGoodsModelList(goodListStr);
             Provide.value<CategoryGoodsListStore>(context).setMallGoodsModelList(list);
+
           }();
 
         });
@@ -115,76 +117,101 @@ class RightCategoryView extends StatefulWidget {
   _RightCategoryViewState createState() => _RightCategoryViewState();
 }
 class _RightCategoryViewState extends State<RightCategoryView> {
-//  int secondCurrentIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Container(
-          height: ScreenUtil().setHeight(80),
-          width: ScreenUtil().setWidth(570),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border(
-              bottom: BorderSide(
-                color: Colors.black12,
-                width: 0.5,
-              )
-            )
-          ),
-          child:Provide<ChildCategory>(
-            builder:(builder,child,childCategory){
-              return ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: childCategory.childCategoryList.length,
-                itemBuilder: (context,index){
-                  return _secondCategoryInkWell(childCategory.childCategoryList[index],index);
-                });
-            }),
-        ),
+//        Text('111'),
+        RightTopWidget(),
         CategoryGoodsList(),
       ],
     );
   }
 
-  Widget _secondCategoryInkWell(BxMallSubDto item,index){
-    return Provide<ChildCategory>(
-        builder:(builder,child,childCategory){
-         return  Container(
-           padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
-           decoration: BoxDecoration(
-               color: childCategory.secondCurrentIndex==index?Colors.black12:Colors.white,
-               border: Border(
-                   right: BorderSide(
-                       width: 0.5,
-                       color: Colors.black12
-                   )
-               )
-           ),
-           child: InkWell(
-             onTap: (){
-               setState(() {
-                 childCategory.secondCurrentIndex = index;
-                 () async{
-                   String goodListStr = await RequestUtil.getGoodsList(categoryId: item.mallCategoryId,categorySubId: item.mallSubId);
-                   MallGoodsResponse.getMallGoodsModelList(goodListStr);
-                   List<MallGoodsModel> list = MallGoodsResponse.getMallGoodsModelList(goodListStr);
-                   Provide.value<CategoryGoodsListStore>(context).setMallGoodsModelList(list);
-                 }();
-               });
-             },
-             child: Text(
-               item.mallSubName,
-               style: TextStyle(
-                 fontSize: ScreenUtil().setSp(28),
-               ),
-             ),
-           ),
-         );
-        },
+
+}
+class RightTopWidget extends StatefulWidget {
+  @override
+  _RightTopWidgetState createState() => _RightTopWidgetState();
+}
+
+class _RightTopWidgetState extends State<RightTopWidget> {
+  @override
+  Widget build(BuildContext context) {
+    MediaQueryData mediaQuery = MediaQuery.of(context);
+    double _screenHeight = mediaQuery.size.height;
+    double _devicePixelRatio = mediaQuery.devicePixelRatio;
+    print('_screenHeight--------->${_screenHeight.toString()}');
+    print('_devicePixelRatio--------->${_devicePixelRatio.toString()}');
+    print('----------');
+    print('ScreenUtil().setHeight(100)=====>${ScreenUtil.screenHeightDp}');
+    return Container(
+      height: ScreenUtil().setHeight(100),
+      width: ScreenUtil().setWidth(570),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+              bottom: BorderSide(
+                color: Colors.black12,
+                width: 0.5,
+              )
+          )
+      ),
+      child:
+//      Text('111111111111111'),
+      Provide<ChildCategory>(
+          builder:(builder,child,childCategory){
+            return
+              ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: childCategory.childCategoryList.length,
+                  itemBuilder: (context,index){
+                    return _secondCategoryInkWell(childCategory.childCategoryList[index],index);
+                  });
+          }),
     );
   }
+  Widget _secondCategoryInkWell(BxMallSubDto item,index){
+    return Provide<ChildCategory>(
+      builder:(builder,child,childCategory){
+        return  Container(
+          padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
+          decoration: BoxDecoration(
+              color: childCategory.secondCurrentIndex==index?Colors.black12:Colors.white,
+              border: Border(
+                  right: BorderSide(
+                      width: 0.5,
+                      color: Colors.black12
+                  )
+              )
+          ),
+          child: InkWell(
+            onTap: (){
+              setState((){
+                childCategory.secondCurrentIndex = index;
+                    () async{
+                  String goodListStr = await RequestUtil.getGoodsList(categoryId: item.mallCategoryId,categorySubId: item.mallSubId);
+                  MallGoodsResponse.getMallGoodsModelList(goodListStr);
+                  List<MallGoodsModel> list = MallGoodsResponse.getMallGoodsModelList(goodListStr);
+                  Provide.value<CategoryGoodsListStore>(context).setMallGoodsModelList(list);
+                }();
+              });
+            },
+            child: Text(
+              item.mallSubName,
+              style: TextStyle(
+                fontSize: ScreenUtil().setSp(28),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
 }
+
+
 // 商品列表 可以上拉加载效果
 class CategoryGoodsList extends StatefulWidget {
   @override
@@ -209,8 +236,7 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
               decoration: BoxDecoration(
               ),
               child:
-            EasyRefresh(
-              child:ListView.builder(
+              ListView.builder(
                   scrollDirection: Axis.vertical,
                   itemCount: categoryGoodsListStore.mallGoodsModelList.length,
                   itemBuilder: (context,index){
@@ -225,17 +251,35 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
                     );
                   }
               ),
-              onRefresh:() async {
-                print('触发onRefresh');
-                this._getGoodsListByPage();
-              },
-              onLoad: () async {
-                print('触发onLoad');
-                this._getGoodsListByPage();
-              },
-              header: PhoenixHeader(),
-              footer: PhoenixFooter(),
-            ),
+//            EasyRefresh(
+//              child:ListView.builder(
+//                  scrollDirection: Axis.vertical,
+//                  itemCount: categoryGoodsListStore.mallGoodsModelList.length,
+//                  itemBuilder: (context,index){
+//                    return Container(
+//                      padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+//                      decoration: BoxDecoration(
+//                          border: Border(
+//                              bottom: BorderSide(color: Colors.black12,width: 0.5)
+//                          )
+//                      ),
+//                      child: new MallGoodsRow(mallGoodsModelList: categoryGoodsListStore.mallGoodsModelList,index: index),
+//                    );
+//                  }
+//              ),
+//              onRefresh:() async {
+//                print('触发onRefresh');
+//                this._getGoodsListByPage(currentPage: 0);
+//              },
+//              onLoad: () async {
+//                if(Provide.value<ChildCategory>(context).currentPage!=-1){
+//                  print('触发onLoad');
+//                  this._getGoodsListByPage(currentPage: Provide.value<ChildCategory>(context).currentPage+1);
+//                }
+//              },
+//              header: TaurusHeader(),
+//              footer: PhoenixFooter(),
+//            ),
 
             );
           });
@@ -248,7 +292,16 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
     String goodListStr = await RequestUtil.getGoodsList(categoryId: currentBxMallSubDtoInfo.mallCategoryId,categorySubId: currentBxMallSubDtoInfo.mallSubId,page: currentPage);
     MallGoodsResponse.getMallGoodsModelList(goodListStr);
     List<MallGoodsModel> list = MallGoodsResponse.getMallGoodsModelList(goodListStr);
-    Provide.value<CategoryGoodsListStore>(context).setMallGoodsModelList(list);
+    if(list!=null){
+      if(currentPage==1){
+        Provide.value<CategoryGoodsListStore>(context).setMallGoodsModelList(list);
+      }else{
+        Provide.value<CategoryGoodsListStore>(context).addMallGoodsModelList(list);
+      }
+      Provide.value<ChildCategory>(context).currentPage = currentPage;
+    }else{
+      Provide.value<ChildCategory>(context).currentPage = -1;
+    }
   }
 }
 // 真是每一行的售卖商品信息
