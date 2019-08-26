@@ -144,7 +144,13 @@ class _RightTopWidgetState extends State<RightTopWidget> {
     print('_screenHeight--------->${_screenHeight.toString()}');
     print('_devicePixelRatio--------->${_devicePixelRatio.toString()}');
     print('----------');
-    print('ScreenUtil().setHeight(100)=====>${ScreenUtil.screenHeightDp}');
+
+    print('ScreenUtil.screenHeight =========>${ScreenUtil.screenHeight}');
+    print('ScreenUtil.instance.height======>${ScreenUtil.instance.height}');
+    print('ScreenUtil.screenHeightDp=====>${ScreenUtil.screenHeightDp}');
+    print('ScreenUtil().setHeight(100)========>${ScreenUtil().setHeight(100)}');
+    print('======================================');
+
     return Container(
       height: ScreenUtil().setHeight(100),
       width: ScreenUtil().setWidth(570),
@@ -236,23 +242,7 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
               decoration: BoxDecoration(
               ),
               child:
-              ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  itemCount: categoryGoodsListStore.mallGoodsModelList.length,
-                  itemBuilder: (context,index){
-                    return Container(
-                      padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                      decoration: BoxDecoration(
-                          border: Border(
-                              bottom: BorderSide(color: Colors.black12,width: 0.5)
-                          )
-                      ),
-                      child: new MallGoodsRow(mallGoodsModelList: categoryGoodsListStore.mallGoodsModelList,index: index),
-                    );
-                  }
-              ),
-//            EasyRefresh(
-//              child:ListView.builder(
+//              ListView.builder(
 //                  scrollDirection: Axis.vertical,
 //                  itemCount: categoryGoodsListStore.mallGoodsModelList.length,
 //                  itemBuilder: (context,index){
@@ -267,19 +257,35 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
 //                    );
 //                  }
 //              ),
-//              onRefresh:() async {
-//                print('触发onRefresh');
-//                this._getGoodsListByPage(currentPage: 0);
-//              },
-//              onLoad: () async {
-//                if(Provide.value<ChildCategory>(context).currentPage!=-1){
-//                  print('触发onLoad');
-//                  this._getGoodsListByPage(currentPage: Provide.value<ChildCategory>(context).currentPage+1);
-//                }
-//              },
-//              header: TaurusHeader(),
-//              footer: PhoenixFooter(),
-//            ),
+            EasyRefresh(
+              child:ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  itemCount: categoryGoodsListStore.mallGoodsModelList.length,
+                  itemBuilder: (context,index){
+                    return Container(
+                      padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                      decoration: BoxDecoration(
+                          border: Border(
+                              bottom: BorderSide(color: Colors.black12,width: 0.5)
+                          )
+                      ),
+                      child: new MallGoodsRow(mallGoodsModelList: categoryGoodsListStore.mallGoodsModelList,index: index),
+                    );
+                  }
+              ),
+              onRefresh:() async {
+                print('触发onRefresh');
+                this._getGoodsListByPage(currentPage: 0);
+              },
+              onLoad: () async {
+                if(Provide.value<ChildCategory>(context).currentPage!=-1){
+                  print('触发onLoad');
+                  this._getGoodsListByPage(currentPage: Provide.value<ChildCategory>(context).currentPage+1);
+                }
+              },
+              header: TaurusHeader(),
+              footer: PhoenixFooter(),
+            ),
 
             );
           });
