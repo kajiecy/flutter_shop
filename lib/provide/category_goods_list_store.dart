@@ -4,7 +4,6 @@ import '../model/mall_goods_model.dart';
 
 class CategoryGoodsListStore with ChangeNotifier{
 
-
   List<MallGoodsModel> mallGoodsModelList = [];
 
   void setMallGoodsModelList(List<MallGoodsModel> value) {
