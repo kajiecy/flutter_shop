@@ -23,7 +23,12 @@ class CategoryPage extends StatelessWidget {
             // 左侧一级分类
             LeftCategoryNav(),
             // 右侧分类及列表视图区
-            RightCategoryView(),
+            Column(
+              children: <Widget>[
+                RightTopWidget(),
+                CategoryGoodsList(),
+              ],
+            ),
           ],
         ),
       ),
@@ -71,13 +76,10 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
           Provide.value<ChildCategory>(context).childCategoryList =
               this.categoryModelList[this.currentIndex].bxMallSubDto;
           () async {
-            String goodListStr = await RequestUtil.getGoodsList(
-                categoryId:
-                    this.categoryModelList[this.currentIndex].mallCategoryId);
-            List<MallGoodsModel> list =
-                MallGoodsResponse.getMallGoodsModelList(goodListStr);
-            Provide.value<CategoryGoodsListStore>(context)
-                .setMallGoodsModelList(list);
+            Provide.value<ChildCategory>(context).currentPage = 1;
+            String goodListStr = await RequestUtil.getGoodsList(categoryId:this.categoryModelList[this.currentIndex].mallCategoryId);
+            List<MallGoodsModel> list = MallGoodsResponse.getMallGoodsModelList(goodListStr);
+            Provide.value<CategoryGoodsListStore>(context).setMallGoodsModelList(list);
           }();
         });
       },
@@ -105,6 +107,7 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
     categoryModelList = getCategoryModelList(result.toString());
     Provide.value<ChildCategory>(context).childCategoryList =
         this.categoryModelList[this.currentIndex].bxMallSubDto;
+    Provide.value<ChildCategory>(context).currentPage = 1;
     String goodListStr = await RequestUtil.getGoodsList(
         categoryId: this.categoryModelList[this.currentIndex].mallCategoryId);
     List<MallGoodsModel> list =
@@ -116,24 +119,6 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
   }
 }
 
-//右侧展示界面
-class RightCategoryView extends StatefulWidget {
-  @override
-  _RightCategoryViewState createState() => _RightCategoryViewState();
-}
-
-class _RightCategoryViewState extends State<RightCategoryView> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-//        Text('111'),
-        RightTopWidget(),
-        CategoryGoodsList(),
-      ],
-    );
-  }
-}
 
 //右侧的二级菜单
 class RightTopWidget extends StatefulWidget {
