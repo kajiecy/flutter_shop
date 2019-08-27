@@ -31,11 +31,13 @@ class CategoryPage extends StatelessWidget {
   }
 }
 
+// 左侧
 //左侧大类导航
 class LeftCategoryNav extends StatefulWidget {
   @override
   _LeftCategoryNavState createState() => _LeftCategoryNavState();
 }
+
 class _LeftCategoryNavState extends State<LeftCategoryNav> {
   List<CategoryModel> categoryModelList = [];
   int currentIndex = 0;
@@ -113,11 +115,13 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
     });
   }
 }
+
 //右侧展示界面
 class RightCategoryView extends StatefulWidget {
   @override
   _RightCategoryViewState createState() => _RightCategoryViewState();
 }
+
 class _RightCategoryViewState extends State<RightCategoryView> {
   @override
   Widget build(BuildContext context) {
@@ -130,16 +134,16 @@ class _RightCategoryViewState extends State<RightCategoryView> {
     );
   }
 }
+
 //右侧的二级菜单
 class RightTopWidget extends StatefulWidget {
   @override
   _RightTopWidgetState createState() => _RightTopWidgetState();
 }
-class _RightTopWidgetState extends State<RightTopWidget> {
 
+class _RightTopWidgetState extends State<RightTopWidget> {
   @override
   Widget build(BuildContext context) {
-
     MediaQueryData mediaQuery = MediaQuery.of(context);
     return Provide<ChildCategory>(builder: (builder, child, childCategory) {
       return Container(
@@ -156,10 +160,12 @@ class _RightTopWidgetState extends State<RightTopWidget> {
               scrollDirection: Axis.horizontal,
               itemCount: childCategory.childCategoryList.length,
               itemBuilder: (context, index) {
-                return _secondCategoryInkWell(childCategory.childCategoryList[index], index);
+                return _secondCategoryInkWell(
+                    childCategory.childCategoryList[index], index);
               }));
     });
   }
+
 //  二级菜单每个点击的框框
   Widget _secondCategoryInkWell(BxMallSubDto item, index) {
     return Provide<ChildCategory>(
@@ -204,11 +210,13 @@ class _RightTopWidgetState extends State<RightTopWidget> {
     );
   }
 }
+
 // 商品列表 可以上拉加载效果
 class CategoryGoodsList extends StatefulWidget {
   @override
   _CategoryGoodsListState createState() => _CategoryGoodsListState();
 }
+
 class _CategoryGoodsListState extends State<CategoryGoodsList> {
   ScrollController _scrollController = new ScrollController();
 
@@ -221,98 +229,64 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
   @override
   Widget build(BuildContext context) {
     print('商品列表build触发');
-    try{
-      if(Provide.value<ChildCategory>(context).currentPage==1){
+    try {
+      if (Provide.value<ChildCategory>(context).currentPage == 1) {
         _scrollController.jumpTo(0.0);
         print('控制请移动到顶部');
       }
-    }catch(e){
+    } catch (e) {
       print('首次加载抛出的异常${e}');
     }
-
 
     return Provide<CategoryGoodsListStore>(
         builder: (builder, child, categoryGoodsListStore) {
       if (categoryGoodsListStore.mallGoodsModelList.length == 0) {
         return Text('暂无数据');
       } else {
-        return
-          Expanded(
-            child:Container(
-              width: ScreenUtil().setWidth(570),
-              decoration: BoxDecoration(),
-              child: EasyRefresh(
-                child: ListView.builder(
-                    controller: _scrollController,
-                    scrollDirection: Axis.vertical,
-                    itemCount: categoryGoodsListStore.mallGoodsModelList.length,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                        decoration: BoxDecoration(border: Border(bottom:BorderSide(color: Colors.black12, width: 0.5))),
-                        // 渲染每一行的内容 包括左侧图片 和 右侧文字
-                        child: new MallGoodsRow(mallGoodsModelList:categoryGoodsListStore.mallGoodsModelList,index: index),
-                      );
-                    }),
-                onRefresh: () async {
-                  this._getGoodsListByPage(currentPage: 1);
-                },
-                onLoad: () async {
-                  if (Provide.value<ChildCategory>(context).currentPage != -1) {
-                    this._getGoodsListByPage(
-                        currentPage:
-                        Provide.value<ChildCategory>(context).currentPage + 1);
-                  }
-                },
-                header: TaurusHeader(),
-                footer: PhoenixFooter(),
-              ),
+        return Expanded(
+          child: Container(
+            width: ScreenUtil().setWidth(570),
+            decoration: BoxDecoration(),
+            child: EasyRefresh(
+              child: ListView.builder(
+                  controller: _scrollController,
+                  scrollDirection: Axis.vertical,
+                  itemCount: categoryGoodsListStore.mallGoodsModelList.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                      decoration: BoxDecoration(
+                          border: Border(
+                              bottom: BorderSide(
+                                  color: Colors.black12, width: 0.5))),
+                      // 渲染每一行的内容 包括左侧图片 和 右侧文字
+                      child: mallGoodsRow(
+                          mallGoodsModelList:
+                              categoryGoodsListStore.mallGoodsModelList,
+                          index: index),
+                    );
+                  }),
+              onRefresh: () async {
+                this._getGoodsListByPage(currentPage: 1);
+              },
+              onLoad: () async {
+                if (Provide.value<ChildCategory>(context).currentPage != -1) {
+                  this._getGoodsListByPage(
+                      currentPage:
+                          Provide.value<ChildCategory>(context).currentPage +
+                              1);
+                }
+              },
+              header: TaurusHeader(),
+              footer: PhoenixFooter(),
             ),
-          );
-
+          ),
+        );
       }
     });
   }
 
-  // 执行上拉加载 下拉刷新时调用的方法
-  void _getGoodsListByPage({int currentPage}) async {
-    BxMallSubDto currentBxMallSubDtoInfo =
-        Provide.value<ChildCategory>(context).getCurrentBxMallSubDtoInfo();
-    String goodListStr = await RequestUtil.getGoodsList(
-        categoryId: currentBxMallSubDtoInfo.mallCategoryId,
-        categorySubId: currentBxMallSubDtoInfo.mallSubId,
-        page: currentPage);
-    MallGoodsResponse.getMallGoodsModelList(goodListStr);
-    List<MallGoodsModel> list =
-        MallGoodsResponse.getMallGoodsModelList(goodListStr);
-    if (list != null) {
-      if (currentPage == 1) {
-        Provide.value<CategoryGoodsListStore>(context)
-            .setMallGoodsModelList(list);
-      } else {
-        Provide.value<CategoryGoodsListStore>(context)
-            .addMallGoodsModelList(list);
-      }
-      Provide.value<ChildCategory>(context).currentPage = currentPage;
-    } else {
-      Provide.value<ChildCategory>(context).currentPage = -1;
-    }
-  }
-}
-// 真实的 每一行的售卖商品信息
-class MallGoodsRow extends StatelessWidget {
-  const MallGoodsRow({
-    Key key,
-    @required this.mallGoodsModelList,
-    @required this.index,
-  }) : super(key: key);
-
-  final List<MallGoodsModel> mallGoodsModelList;
-  final int index;
-
-  @override
-  Widget build(BuildContext context) {
-    print('触发行构建');
+  Widget mallGoodsRow({List<MallGoodsModel> mallGoodsModelList, int index}) {
     return Row(
       children: <Widget>[
         Image.network(
@@ -320,12 +294,13 @@ class MallGoodsRow extends StatelessWidget {
           width: ScreenUtil().setWidth(200),
           height: ScreenUtil().setHeight(200),
         ),
-        rightContent()
+        rightContent(mallGoodsModelList: mallGoodsModelList, index: index)
       ],
     );
   }
+
   // 右侧文本
-  Container rightContent() {
+  Container rightContent({List<MallGoodsModel> mallGoodsModelList, int index}) {
     return Container(
       width: ScreenUtil().setWidth(370),
       decoration: BoxDecoration(),
@@ -365,6 +340,31 @@ class MallGoodsRow extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // 执行上拉加载 下拉刷新时调用的方法
+  void _getGoodsListByPage({int currentPage}) async {
+    BxMallSubDto currentBxMallSubDtoInfo =
+        Provide.value<ChildCategory>(context).getCurrentBxMallSubDtoInfo();
+    String goodListStr = await RequestUtil.getGoodsList(
+        categoryId: currentBxMallSubDtoInfo.mallCategoryId,
+        categorySubId: currentBxMallSubDtoInfo.mallSubId,
+        page: currentPage);
+    MallGoodsResponse.getMallGoodsModelList(goodListStr);
+    List<MallGoodsModel> list =
+        MallGoodsResponse.getMallGoodsModelList(goodListStr);
+    if (list != null) {
+      if (currentPage == 1) {
+        Provide.value<CategoryGoodsListStore>(context)
+            .setMallGoodsModelList(list);
+      } else {
+        Provide.value<CategoryGoodsListStore>(context)
+            .addMallGoodsModelList(list);
+      }
+      Provide.value<ChildCategory>(context).currentPage = currentPage;
+    } else {
+      Provide.value<ChildCategory>(context).currentPage = -1;
+    }
   }
 }
 
