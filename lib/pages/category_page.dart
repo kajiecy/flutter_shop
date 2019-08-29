@@ -49,6 +49,7 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
 
   @override
   Widget build(BuildContext context) {
+    print('1111');
     return Container(
       width: ScreenUtil().setWidth(180),
       decoration: BoxDecoration(
@@ -73,14 +74,9 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
       onTap: () {
         setState(() {
           this.currentIndex = index;
-          Provide.value<ChildCategory>(context).childCategoryList =
-              this.categoryModelList[this.currentIndex].bxMallSubDto;
-          () async {
-            Provide.value<ChildCategory>(context).currentPage = 1;
-            String goodListStr = await RequestUtil.getGoodsList(categoryId:this.categoryModelList[this.currentIndex].mallCategoryId);
-            List<MallGoodsModel> list = MallGoodsResponse.getMallGoodsModelList(goodListStr);
-            Provide.value<CategoryGoodsListStore>(context).setMallGoodsModelList(list);
-          }();
+          Provide.value<ChildCategory>(context).childCategoryList = this.categoryModelList[this.currentIndex].bxMallSubDto;
+          Provide.value<ChildCategory>(context).currentPage = 1;
+          _getGoodsList(categoryId:this.categoryModelList[this.currentIndex].mallCategoryId,page: Provide.value<ChildCategory>(context).currentPage);
         });
       },
       child: Container(
@@ -108,14 +104,17 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
     Provide.value<ChildCategory>(context).childCategoryList =
         this.categoryModelList[this.currentIndex].bxMallSubDto;
     Provide.value<ChildCategory>(context).currentPage = 1;
-    String goodListStr = await RequestUtil.getGoodsList(
-        categoryId: this.categoryModelList[this.currentIndex].mallCategoryId);
-    List<MallGoodsModel> list =
-        MallGoodsResponse.getMallGoodsModelList(goodListStr);
+    String goodListStr = await RequestUtil.getGoodsList(categoryId: this.categoryModelList[this.currentIndex].mallCategoryId);
+    List<MallGoodsModel> list = MallGoodsResponse.getMallGoodsModelList(goodListStr);
     setState(() {
-      Provide.value<CategoryGoodsListStore>(context)
-          .setMallGoodsModelList(list);
+      Provide.value<CategoryGoodsListStore>(context).setMallGoodsModelList(list);
     });
+  }
+
+  void _getGoodsList({String categoryId, String categorySubId = '', int page}) async{
+    String goodListStr = await request('getMallGoods', formData: {"categoryId": categoryId,"categorySubId": categorySubId,"page": page,});
+    List<MallGoodsModel> list = MallGoodsResponse.getMallGoodsModelList(goodListStr);
+    Provide.value<CategoryGoodsListStore>(context).setMallGoodsModelList(list);
   }
 }
 
@@ -168,11 +167,12 @@ class _RightTopWidgetState extends State<RightTopWidget> {
               setState(() {
                 childCategory.secondCurrentIndex = index;
                 () async {
-                  String goodListStr = await RequestUtil.getGoodsList(
+                  Provide.value<ChildCategory>(context).currentPage = 1;
+                  List<MallGoodsModel> list = await _getGoodsList(
                       categoryId: item.mallCategoryId,
-                      categorySubId: item.mallSubId);
-                  List<MallGoodsModel> list =
-                      MallGoodsResponse.getMallGoodsModelList(goodListStr);
+                      categorySubId: item.mallSubId,
+                      page: 1,
+                  );
                   if (list != null) {
                     Provide.value<CategoryGoodsListStore>(context)
                         .setMallGoodsModelList(list);
@@ -194,6 +194,10 @@ class _RightTopWidgetState extends State<RightTopWidget> {
       },
     );
   }
+  Future<List<MallGoodsModel>> _getGoodsList({String categoryId, String categorySubId = '', int page}) async{
+    String goodListStr = await request('getMallGoods', formData: {"categoryId": categoryId,"categorySubId": categorySubId,"page": page,});
+    return MallGoodsResponse.getMallGoodsModelList(goodListStr);
+  }
 }
 
 // 商品列表 可以上拉加载效果
@@ -203,26 +207,9 @@ class CategoryGoodsList extends StatefulWidget {
 }
 
 class _CategoryGoodsListState extends State<CategoryGoodsList> {
-  ScrollController _scrollController = new ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    print('商品列表initState触发');
-  }
-
   @override
   Widget build(BuildContext context) {
-    print('商品列表build触发');
-    try {
-      if (Provide.value<ChildCategory>(context).currentPage == 1) {
-        _scrollController.jumpTo(0.0);
-        print('控制请移动到顶部');
-      }
-    } catch (e) {
-      print('首次加载抛出的异常${e}');
-    }
-
+    print('商品列表build触发' );
     return Provide<CategoryGoodsListStore>(
         builder: (builder, child, categoryGoodsListStore) {
       if (categoryGoodsListStore.mallGoodsModelList.length == 0) {
@@ -234,7 +221,7 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
             decoration: BoxDecoration(),
             child: EasyRefresh(
               child: ListView.builder(
-                  controller: _scrollController,
+//                  controller: _scrollController,
                   scrollDirection: Axis.vertical,
                   itemCount: categoryGoodsListStore.mallGoodsModelList.length,
                   itemBuilder: (context, index) {
@@ -242,13 +229,11 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
                       padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                       decoration: BoxDecoration(
                           border: Border(
-                              bottom: BorderSide(
-                                  color: Colors.black12, width: 0.5))),
+                              bottom: BorderSide(color: Colors.black12, width: 0.5)
+                          )
+                      ),
                       // 渲染每一行的内容 包括左侧图片 和 右侧文字
-                      child: mallGoodsRow(
-                          mallGoodsModelList:
-                              categoryGoodsListStore.mallGoodsModelList,
-                          index: index),
+                      child: mallGoodsRow(mallGoodsModelList:categoryGoodsListStore.mallGoodsModelList,index: index),
                     );
                   }),
               onRefresh: () async {
@@ -256,10 +241,7 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
               },
               onLoad: () async {
                 if (Provide.value<ChildCategory>(context).currentPage != -1) {
-                  this._getGoodsListByPage(
-                      currentPage:
-                          Provide.value<ChildCategory>(context).currentPage +
-                              1);
+                  this._getGoodsListByPage(currentPage:Provide.value<ChildCategory>(context).currentPage +1);
                 }
               },
               header: TaurusHeader(),
