@@ -10,6 +10,7 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/phoenix_footer.dart';
 import 'package:flutter_easyrefresh/taurus_header.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import '../routers/application.dart';
 
 class CategoryPage extends StatelessWidget {
   @override
@@ -253,16 +254,21 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
   }
 
   Widget mallGoodsRow({List<MallGoodsModel> mallGoodsModelList, int index}) {
-    return Row(
-      children: <Widget>[
-        Image.network(
-          mallGoodsModelList[index].image,
-          width: ScreenUtil().setWidth(200),
-          height: ScreenUtil().setHeight(200),
-        ),
-        rightContent(mallGoodsModelList: mallGoodsModelList, index: index)
-      ],
-    );
+    return InkWell(
+      onTap: (){
+        print('mallGoodsModelList[index] ${mallGoodsModelList[index].goodsId}');
+        Application.router.navigateTo(context, '/detail/${mallGoodsModelList[index].goodsId}');
+      },
+      child: Row(
+        children: <Widget>[
+          Image.network(
+            mallGoodsModelList[index].image,
+            width: ScreenUtil().setWidth(200),
+            height: ScreenUtil().setHeight(200),
+          ),
+          rightContent(mallGoodsModelList: mallGoodsModelList, index: index)
+        ],
+    ));
   }
 
   // 右侧文本

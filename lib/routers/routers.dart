@@ -4,7 +4,7 @@ import './router_handler.dart';
 
 class Routes{
   static String root = '/';
-  static String detailPage = '/detail';
+  static String detailPage = '/detail/:id';
   static void configureRoutes(Router router){
     router.notFoundHandler = new Handler(
       handlerFunc:(BuildContext context,Map<String,List<String>> params){
