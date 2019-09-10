@@ -9,6 +9,7 @@ import '../model/mall_goods_model.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/phoenix_footer.dart';
 import 'package:flutter_easyrefresh/taurus_header.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CategoryPage extends StatelessWidget {
   @override
@@ -49,7 +50,6 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
 
   @override
   Widget build(BuildContext context) {
-    print('1111');
     return Container(
       width: ScreenUtil().setWidth(180),
       decoration: BoxDecoration(
@@ -209,7 +209,6 @@ class CategoryGoodsList extends StatefulWidget {
 class _CategoryGoodsListState extends State<CategoryGoodsList> {
   @override
   Widget build(BuildContext context) {
-    print('商品列表build触发' );
     return Provide<CategoryGoodsListStore>(
         builder: (builder, child, categoryGoodsListStore) {
       if (categoryGoodsListStore.mallGoodsModelList.length == 0) {
@@ -330,6 +329,15 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
       }
       Provide.value<ChildCategory>(context).currentPage = currentPage;
     } else {
+      Fluttertoast.showToast(
+          msg: "已经到底了~",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIos: 1,
+          backgroundColor: Colors.pink,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
       Provide.value<ChildCategory>(context).currentPage = -1;
     }
   }
