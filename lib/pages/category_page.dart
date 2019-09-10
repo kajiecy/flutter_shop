@@ -256,7 +256,6 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
   Widget mallGoodsRow({List<MallGoodsModel> mallGoodsModelList, int index}) {
     return InkWell(
       onTap: (){
-        print('mallGoodsModelList[index] ${mallGoodsModelList[index].goodsId}');
         Application.router.navigateTo(context, '/detail/${mallGoodsModelList[index].goodsId}');
       },
       child: Row(
