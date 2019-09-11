@@ -1,51 +1,75 @@
 import 'package:flutter/material.dart';
-import '../provide/counter.dart';
-import 'package:provide/provide.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class CartPage extends StatelessWidget {
+class CartPage extends StatefulWidget {
+  @override
+  _CartPageState createState() => _CartPageState();
+}
+
+class _CartPageState extends State<CartPage> {
+
+  List<String> testList = [];
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          children: <Widget>[
-            Number(),
-          ],
-        ),
+    _show();
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            height: 500.0,
+            child: ListView.builder(
+              itemCount: testList.length,
+              itemBuilder:(context,index){
+                return ListTile(
+                  title: Text(testList[index]),
+                );
+              },
+            ),
+          ),
+          RaisedButton(
+            onPressed: (){
+              _add();
+            },
+            child: Text('增加'),
+          ),
+          RaisedButton(
+            onPressed: (){
+              _clear();
+            },
+            child: Text('清空'),
+          ),
+        ],
       ),
     );
   }
-}
-
-
-
-
-
-class Number extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        margin: EdgeInsets.only(top: 200),
-        child: Provide<Counter>(
-            builder:(builder,child,counter){
-            return Text('${counter.value}',
-            style: Theme.of(context).textTheme.display1,);
-        })
-    );
+  // 增加方法
+  void _add() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String temp = "hello sp!";
+    setState(() {
+      testList.add(temp);
+      prefs.setStringList('tempList', testList);
+    });
   }
-}
+  // 查询
+  void _show() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> getInfo = prefs.getStringList('tempList');
+    if(getInfo!=null){
+      setState(() {
+        this.testList = getInfo;
+      });
+    }
+  }
 
-class MyButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: RaisedButton(
-            onPressed: (){
-              Provide.value<Counter>(context).increment();
-            },
-            child: Text('++'),
-          ),
-    );
+  // 删除
+  void _clear() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('tempList');
+    setState(() {
+      this.testList = [];
+    });
   }
 }
 
