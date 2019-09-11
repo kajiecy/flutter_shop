@@ -8,8 +8,21 @@ class DetailWeb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var goodsDetail = Provide.value<GoodsDetailProvide>(context).goodsDetail.goodInfo.goodsDetail;
-    return Container(
-      child: Html(data: goodsDetail),
+    return Provide<GoodsDetailProvide>(
+      builder: (context,child,goodDetailProvide){
+        if(goodDetailProvide.isLeft){
+          return  Container(
+            child: Html(data: goodsDetail),
+          );
+        }else{
+          return Container(
+            padding: EdgeInsets.all(10.0),
+            width: ScreenUtil().setWidth(750.0),
+            alignment: Alignment.center,
+            child: Text('暂无评论'),
+          );
+        }
+      },
     );
   }
 }
