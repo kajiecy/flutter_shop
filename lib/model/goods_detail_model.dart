@@ -78,7 +78,7 @@ class GoodInfo {
   int state;
   String shopId;
   String goodsName;
-  String data;
+  String goodsDetail;
 
   GoodInfo(
       {this.image5,
@@ -96,7 +96,7 @@ class GoodInfo {
         this.state,
         this.shopId,
         this.goodsName,
-        this.data});
+        this.goodsDetail});
 
   GoodInfo.fromJson(Map<String, dynamic> json) {
     image5 = json['image5'];
@@ -114,7 +114,7 @@ class GoodInfo {
     state = json['state'];
     shopId = json['shopId'];
     goodsName = json['goodsName'];
-    data = json['data'];
+    goodsDetail = json['goodsDetail'];
   }
 
   Map<String, dynamic> toJson() {
@@ -134,7 +134,7 @@ class GoodInfo {
     data['state'] = this.state;
     data['shopId'] = this.shopId;
     data['goodsName'] = this.goodsName;
-    data['data'] = this.data;
+    data['goodsDetail'] = this.goodsDetail;
     return data;
   }
 }

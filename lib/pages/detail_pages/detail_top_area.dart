@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provide/provide.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../provide/goods_detail_provide.dart';
-import '../../model/goods_detail_model.dart';
 
 class DetailTopArea extends StatelessWidget {
   @override
