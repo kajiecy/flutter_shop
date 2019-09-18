@@ -7,6 +7,8 @@ import './detail_pages/detail_tabbar.dart';
 import './detail_pages/detail_web.dart';
 import './detail_pages/detail_bottom.dart';
 
+
+
 class DetailsPage extends StatelessWidget {
   final String goodsId;
   DetailsPage(this.goodsId);

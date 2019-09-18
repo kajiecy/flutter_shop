@@ -8,12 +8,14 @@ import 'package:fluro/fluro.dart';
 import './routers/routers.dart';
 import './routers/application.dart';
 import './provide/goods_detail_provide.dart';
+import './provide/car_provide.dart';
 
 void main(){
   var counter = Counter();
   var childCategory = ChildCategory();
   var categoryGoodsList = CategoryGoodsListStore();
   var goodsDetailProvide = GoodsDetailProvide();
+  var carProvide = CarProvide();
   // 全局状态管理
   final providers = Providers();
 
@@ -23,7 +25,8 @@ void main(){
     ..provide(Provider<Counter>.value(counter))
     ..provide(Provider<ChildCategory>.value(childCategory))
     ..provide(Provider<CategoryGoodsListStore>.value(categoryGoodsList))
-    ..provide(Provider<GoodsDetailProvide>.value(goodsDetailProvide));
+    ..provide(Provider<GoodsDetailProvide>.value(goodsDetailProvide))
+    ..provide(Provider<CarProvide>.value(carProvide));
   runApp(ProviderNode(providers: providers,child: MyApp(),));
 }
 
